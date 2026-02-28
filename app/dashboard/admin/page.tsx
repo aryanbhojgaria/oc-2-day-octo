@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { DashboardShell } from "@/components/layout/dashboard-shell"
-import { adminStats, enrollmentTrend, departmentDistribution } from "@/lib/mock-data"
+import { adminStats, enrollmentTrend, departmentDistribution, announcements, requests } from "@/lib/mock-data"
 import { useAnnouncementsWithMutations, useRequests, DataLoading } from "@/lib/hooks"
 import { Megaphone, FileCheck, CalendarDays, Settings, Users, GraduationCap, Building2, Palette, Check, X, Clock, TrendingUp, ImagePlus, Upload } from "lucide-react"
 import { motion } from "framer-motion"
@@ -48,8 +48,8 @@ export default function AdminDashboardPage() {
   const annHook = useAnnouncementsWithMutations()
   const reqHook = useRequests()
 
-  const liveAnnouncements = annHook.data ?? []
-  const liveRequests = reqHook.data ?? []
+  const liveAnnouncements = annHook.data && annHook.data.length > 0 ? annHook.data : (announcements as any[])
+  const liveRequests = reqHook.data && reqHook.data.length > 0 ? reqHook.data : (requests as any[])
 
   const handlePublish = async () => {
     if (!announcementTitle.trim()) return

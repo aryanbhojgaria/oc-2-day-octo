@@ -233,7 +233,7 @@ export const requests = [
   {
     id: "REQ001",
     type: "Leave Request",
-    from: "Arjun Mehta (STU001)",
+    fromName: "Arjun Mehta (STU001)",
     date: "2026-02-24",
     reason: "Family function in hometown",
     status: "pending",
@@ -241,7 +241,7 @@ export const requests = [
   {
     id: "REQ002",
     type: "Event Approval",
-    from: "Tech Club",
+    fromName: "Tech Club",
     date: "2026-02-23",
     reason: "Permission to conduct hackathon in Seminar Hall on March 10",
     status: "pending",
@@ -249,7 +249,7 @@ export const requests = [
   {
     id: "REQ003",
     type: "Budget Request",
-    from: "Sports Club",
+    fromName: "Sports Club",
     date: "2026-02-22",
     reason: "Equipment purchase for upcoming inter-college tournament",
     status: "approved",
@@ -257,7 +257,7 @@ export const requests = [
   {
     id: "REQ004",
     type: "Facility Booking",
-    from: "Music Club",
+    fromName: "Music Club",
     date: "2026-02-21",
     reason: "Auditorium booking for Rhythm Night rehearsal",
     status: "pending",
