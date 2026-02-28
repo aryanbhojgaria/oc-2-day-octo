@@ -1,0 +1,202 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ─── USER (auth) ──────────────────────────────────────────────────
+// role: ADMIN | TEACHER | STUDENT | PARENT | CLUB
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  role         String   // "ADMIN" | "TEACHER" | "STUDENT" | "PARENT" | "CLUB"
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  student       Student?
+  teacher       Teacher?
+  notifications Notification[]
+  fees          Fee[]
+}
+
+// ─── STUDENT ──────────────────────────────────────────────────────
+model Student {
+  id         String  @id @default(cuid())
+  externalId String  @unique
+  name       String
+  department String
+  year       Int
+  hostel     Boolean @default(false)
+  attendance Float   @default(0)
+  cgpa       Float   @default(0)
+  photo      String  @default("/avatars/student1.jpg")
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  marks             Mark[]
+  attendanceRecords AttendanceRecord[]
+
+  @@map("students")
+}
+
+// ─── TEACHER ──────────────────────────────────────────────────────
+model Teacher {
+  id         String @id @default(cuid())
+  externalId String @unique
+  name       String
+  department String
+  subject    String
+  experience Int    @default(0)
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("teachers")
+}
+
+// ─── ANNOUNCEMENT ─────────────────────────────────────────────────
+// priority: "low" | "medium" | "high"
+model Announcement {
+  id         String   @id @default(cuid())
+  externalId String   @unique
+  title      String
+  content    String
+  author     String
+  date       String
+  priority   String   @default("medium")
+  createdAt  DateTime @default(now())
+
+  @@map("announcements")
+}
+
+// ─── EVENT ────────────────────────────────────────────────────────
+// status: "upcoming" | "past" | "ongoing"
+model Event {
+  id            String   @id @default(cuid())
+  externalId    String   @unique
+  title         String
+  club          String
+  date          String
+  description   String
+  status        String   @default("upcoming")
+  registrations Int      @default(0)
+  createdAt     DateTime @default(now())
+
+  @@map("events")
+}
+
+// ─── REQUEST ──────────────────────────────────────────────────────
+// status: "pending" | "approved" | "rejected"
+model Request {
+  id         String   @id @default(cuid())
+  externalId String   @unique
+  type       String
+  fromName   String
+  date       String
+  reason     String
+  status     String   @default("pending")
+  createdAt  DateTime @default(now())
+
+  @@map("requests")
+}
+
+// ─── FEE ──────────────────────────────────────────────────────────
+// status: "pending" | "paid"
+model Fee {
+  id         String   @id @default(cuid())
+  externalId String   @unique
+  type       String
+  amount     Float
+  dueDate    String
+  status     String   @default("pending")
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@map("fees")
+}
+
+// ─── MARK ─────────────────────────────────────────────────────────
+model Mark {
+  id         String  @id @default(cuid())
+  subject    String
+  internal1  Int     @default(0)
+  internal2  Int     @default(0)
+  assignment Int     @default(0)
+  total      Int     @default(0)
+  grade      String
+
+  studentId String
+  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@map("marks")
+}
+
+// ─── ATTENDANCE RECORD ────────────────────────────────────────────
+// status: "present" | "absent"
+model AttendanceRecord {
+  id      String @id @default(cuid())
+  date    String
+  subject String
+  status  String @default("present")
+
+  studentId String
+  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@map("attendance_records")
+}
+
+// ─── CLUB ─────────────────────────────────────────────────────────
+model Club {
+  id          String @id @default(cuid())
+  externalId  String @unique
+  name        String
+  accent      String
+  members     Int    @default(0)
+  description String
+
+  @@map("clubs")
+}
+
+// ─── NOTIFICATION ─────────────────────────────────────────────────
+model Notification {
+  id         String  @id @default(cuid())
+  externalId String  @unique
+  title      String
+  message    String
+  time       String
+  read       Boolean @default(false)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@map("notifications")
+}
+
+// ─── TIMETABLE ────────────────────────────────────────────────────
+model Timetable {
+  id        String   @id @default(cuid())
+  role      String
+  day       String
+  slots     String   // JSON string: Array of { subject, room }
+  createdAt DateTime @default(now())
+
+  @@unique([role, day])
+  @@map("timetable")
+}
