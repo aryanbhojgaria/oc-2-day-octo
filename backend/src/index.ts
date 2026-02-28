@@ -15,7 +15,7 @@ import timetableRouter from "./routes/timetable"
 import notificationsRouter from "./routes/notifications"
 
 const app = express()
-const PORT = process.env.PORT || 4000
+const PORT = process.env.PORT_BACKEND || 5000
 
 // ─── Middleware ───────────────────────────────────────────────────
 app.use(cors({
