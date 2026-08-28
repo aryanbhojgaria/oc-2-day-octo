@@ -200,3 +200,57 @@ model Timetable {
   @@unique([role, day])
   @@map("timetable")
 }
+
+// ─── EXAM ─────────────────────────────────────────────────────────
+model Exam {
+  id         String   @id @default(cuid())
+  externalId String   @unique
+  subject    String
+  date       String
+  time       String
+  duration   Int      // in minutes
+  createdAt  DateTime @default(now())
+
+  seatingPlans SeatingPlan[]
+
+  @@map("exams")
+}
+
+// ─── SEATING PLAN ─────────────────────────────────────────────────
+model SeatingPlan {
+  id         String @id @default(cuid())
+  room       String
+  totalSeats Int
+  assigned   Int    @default(0)
+  
+  examId     String
+  exam       Exam   @relation(fields: [examId], references: [id], onDelete: Cascade)
+
+  // We could link directly to Students, but for a prototype, storing the list of student IDs as JSON is simpler/faster.
+  students   String   // JSON string: Array of Student IDs or details
+
+  createdAt  DateTime @default(now())
+
+  @@map("seating_plans")
+}
+
+// ─── CALENDAR EVENT ───────────────────────────────────────────────
+// type: "exam" | "holiday" | "event" | "deadline" | "personal" | "fee"
+model CalendarEvent {
+  id          String   @id @default(cuid())
+  title       String
+  description String   @default("")
+  date        String   // ISO date string YYYY-MM-DD
+  endDate     String?  // optional end date for range events
+  type        String   // exam | holiday | event | deadline | personal | fee
+  color       String?  // optional hex/oklch colour override
+  createdBy   String   @default("ADMIN") // role that created it
+
+  // For personal events (student deadlines)
+  userId      String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("calendar_events")
+}

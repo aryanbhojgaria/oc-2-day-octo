@@ -157,6 +157,46 @@ export interface Notification {
     read: boolean
 }
 
+export interface SeatingPlan {
+    id: string
+    room: string
+    totalSeats: number
+    assigned: number
+    examId: string
+    students: string // JSON representation
+    createdAt: string
+}
+
+export interface Exam {
+    id: string
+    externalId: string
+    subject: string
+    date: string
+    time: string
+    duration: number
+    seatingPlans?: SeatingPlan[]
+    createdAt: string
+}
+
+export interface CalendarEvent {
+    id: string
+    title: string
+    description: string
+    date: string
+    endDate?: string | null
+    type: "exam" | "holiday" | "event" | "deadline" | "personal" | "fee"
+    color?: string | null
+    createdBy: string
+    userId?: string | null
+    createdAt: string
+    updatedAt: string
+}
+
+export interface CalendarConflict {
+    date: string
+    events: CalendarEvent[]
+}
+
 // ─── Auth API ────────────────────────────────────────────────────
 export const auth = {
     login: (email: string, password: string) =>
@@ -264,4 +304,25 @@ export const notificationsApi = {
     list: () => apiFetch<Notification[]>("/api/notifications"),
     markRead: (id: string) => apiFetch<Notification>(`/api/notifications/${id}/read`, { method: "PATCH" }),
     markAllRead: () => apiFetch<{ message: string }>("/api/notifications/read-all", { method: "PATCH" }),
+}
+
+// ─── Exams API ───────────────────────────────────────────────────
+export const examsApi = {
+    list: () => apiFetch<Exam[]>("/api/exams"),
+    get: (id: string) => apiFetch<Exam>(`/api/exams/${id}`),
+    generateSeating: (id: string) => apiFetch<{ message: string, plans: SeatingPlan[] }>(`/api/exams/${id}/generate-seating`, { method: "POST" })
+}
+
+// ─── Calendar API ────────────────────────────────────────────────
+export const calendarApi = {
+    list: (userId?: string) =>
+        apiFetch<CalendarEvent[]>(`/api/calendar${userId ? `?userId=${userId}` : ""}`),
+    create: (data: Omit<CalendarEvent, "id" | "createdAt" | "updatedAt">) =>
+        apiFetch<CalendarEvent>("/api/calendar", { method: "POST", body: JSON.stringify(data) }),
+    update: (id: string, data: Partial<CalendarEvent>) =>
+        apiFetch<CalendarEvent>(`/api/calendar/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+    delete: (id: string) =>
+        apiFetch<void>(`/api/calendar/${id}`, { method: "DELETE" }),
+    conflicts: (userId?: string) =>
+        apiFetch<CalendarConflict[]>(`/api/calendar/conflicts${userId ? `?userId=${userId}` : ""}`),
 }

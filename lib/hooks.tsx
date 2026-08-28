@@ -9,10 +9,11 @@ import { useState, useEffect, useCallback } from "react"
 import {
     studentsApi, teachersApi, announcementsApi, eventsApi,
     requestsApi, feesApi, marksApi, attendanceApi, clubsApi,
-    timetableApi, notificationsApi, getToken,
+    timetableApi, notificationsApi, examsApi, calendarApi, getToken,
     type Student, type Teacher, type Announcement, type Event,
     type Request, type Fee, type Mark, type AttendanceRecord,
-    type Club, type TimetableEntry, type Notification,
+    type Club, type TimetableEntry, type Notification, type Exam, type SeatingPlan,
+    type CalendarEvent, type CalendarConflict,
 } from "./api"
 
 // ─── Generic hook factory ────────────────────────────────────────────────────
@@ -145,6 +146,22 @@ export function useNotifications() {
     return { data, loading, error, refetch, markRead, markAllRead }
 }
 
+// ─── Exams (Smart Exam feature) ──────────────────────────────────────────────
+export function useExams() {
+    return useApiData<Exam[]>(() => examsApi.list())
+}
+
+export function useExamWithMutations() {
+    const { data, loading, error, refetch } = useExams()
+
+    const generateSeating = useCallback(async (id: string) => {
+        await examsApi.generateSeating(id)
+        refetch()
+    }, [refetch])
+
+    return { data, loading, error, refetch, generateSeating }
+}
+
 // ─── Announcements with create mutation ──────────────────────────────────────
 export function useAnnouncementsWithMutations() {
     const { data, loading, error, refetch } = useApiData<Announcement[]>(
@@ -164,23 +181,53 @@ export function useAnnouncementsWithMutations() {
     return { data, loading, error, refetch, create, remove }
 }
 
+// ─── Calendar Events ─────────────────────────────────────────────────────────
+export function useCalendarEvents(userId?: string) {
+    return useApiData<CalendarEvent[]>(() => calendarApi.list(userId), [userId])
+}
+
+export function useCalendarWithMutations(userId?: string) {
+    const { data, loading, error, refetch } = useCalendarEvents(userId)
+
+    const create = useCallback(async (event: Omit<CalendarEvent, "id" | "createdAt" | "updatedAt">) => {
+        await calendarApi.create(event)
+        refetch()
+    }, [refetch])
+
+    const update = useCallback(async (id: string, event: Partial<CalendarEvent>) => {
+        await calendarApi.update(id, event)
+        refetch()
+    }, [refetch])
+
+    const remove = useCallback(async (id: string) => {
+        await calendarApi.delete(id)
+        refetch()
+    }, [refetch])
+
+    return { data, loading, error, refetch, create, update, remove }
+}
+
+export function useCalendarConflicts(userId?: string) {
+    return useApiData<CalendarConflict[]>(() => calendarApi.conflicts(userId), [userId])
+}
+
 // ─── Shared loading skeleton ─────────────────────────────────────────────────
 export function DataLoading({ rows = 3 }: { rows?: number }) {
     return (
-        <div className= "space-y-3 animate-pulse" >
-        {
-            Array.from({ length: rows }).map((_, i) => (
-                <div key= { i } className = "h-14 rounded-xl bg-secondary/60" />
-      ))
-        }
+        <div className="space-y-3 animate-pulse" >
+            {
+                Array.from({ length: rows }).map((_, i) => (
+                    <div key={i} className="h-14 rounded-xl bg-secondary/60" />
+                ))
+            }
         </div>
-  )
+    )
 }
 
 export function DataError({ message }: { message: string }) {
     return (
-        <div className= "rounded-xl border border-red-500/20 bg-red-500/5 p-4 text-sm text-red-500" >
-      ⚠️ { message } — showing cached data if available.
-    </div>
+        <div className="rounded-xl border border-red-500/20 bg-red-500/5 p-4 text-sm text-red-500" >
+            ⚠️ {message} — showing cached data if available.
+        </div>
     )
 }

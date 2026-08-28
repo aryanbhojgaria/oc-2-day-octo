@@ -13,6 +13,8 @@ import attendanceRouter from "./routes/attendance"
 import clubsRouter from "./routes/clubs"
 import timetableRouter from "./routes/timetable"
 import notificationsRouter from "./routes/notifications"
+import examsRouter from "./routes/exams"
+import calendarRouter from "./routes/calendar"
 
 const app = express()
 const PORT = process.env.PORT_BACKEND || 4000
@@ -43,6 +45,8 @@ app.use("/api/attendance", attendanceRouter)
 app.use("/api/clubs", clubsRouter)
 app.use("/api/timetable", timetableRouter)
 app.use("/api/notifications", notificationsRouter)
+app.use("/api/exams", examsRouter)
+app.use("/api/calendar", calendarRouter)
 
 // ─── 404 Handler ──────────────────────────────────────────────────
 app.use((_req, res) => {

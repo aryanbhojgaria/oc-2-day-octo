@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { DashboardShell } from "@/components/layout/dashboard-shell"
+import { SmartCalendar } from "@/components/smart-calendar"
 import { students, marks, past15Days, studentHistoricalAttendance, timetable } from "@/lib/mock-data"
 import { useStudents, useMarks, useTimetable, DataLoading } from "@/lib/hooks"
 import { BookOpen, Users, FileText, QrCode, CheckCircle2, Ticket, Bus, Home, Clock, Check, X, Map, Shield, Calendar, Award, ListChecks, CalendarDays, UserCheck, BarChart3 } from "lucide-react"
@@ -445,82 +446,7 @@ export default function TeacherDashboardPage() {
 
       {/* Calendar Tab */}
       {activeTab === "calendar" && (
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
-          <div className="flex items-center justify-between rounded-xl border border-border bg-card p-5">
-            <div>
-              <h2 className="text-base font-semibold text-foreground">Academic Calendar</h2>
-              <p className="text-xs text-muted-foreground">March 2026 &mdash; Exam &amp; Holiday Schedule</p>
-            </div>
-            <div className="flex gap-2">
-              <button className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-card hover:bg-muted transition-colors">&lt;</button>
-              <button className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-card hover:bg-muted transition-colors">&gt;</button>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-[1fr_280px] gap-4 items-start">
-            <div className="rounded-xl border border-border bg-card p-5">
-              <div className="grid grid-cols-7 gap-1.5 mb-3">
-                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
-                  <div key={d} className="text-center text-[10px] font-semibold text-muted-foreground uppercase">{d}</div>
-                ))}
-              </div>
-              <div className="grid grid-cols-7 gap-1.5">
-                {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => {
-                  let eventType: string | null = null
-                  if (day >= 1 && day <= 5) eventType = "exam"
-                  else if (day === 10) eventType = "holiday"
-                  else if (day === 15) eventType = "event"
-                  else if (day === 20) eventType = "deadline"
-                  return (
-                    <div key={day} className={cn(
-                      "aspect-square rounded-lg border border-border/50 p-1 flex flex-col justify-between transition-colors cursor-pointer",
-                      eventType ? "bg-secondary/20 hover:bg-secondary/40" : "bg-card hover:bg-secondary/10",
-                      day === 28 && "border-primary/60 bg-primary/5"
-                    )}>
-                      <span className={cn(
-                        "text-[11px] font-medium",
-                        day === 28 ? "flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground text-[10px]" : "text-foreground"
-                      )}>{day}</span>
-                      {eventType && (
-                        <div className={cn(
-                          "h-1.5 w-1.5 rounded-full",
-                          eventType === "exam" ? "bg-red-500" : eventType === "holiday" ? "bg-emerald-500" : eventType === "event" ? "bg-blue-500" : "bg-amber-500"
-                        )} />
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-
-            <div className="rounded-xl border border-border bg-card p-5">
-              <h3 className="text-sm font-semibold text-foreground mb-4">Upcoming Events</h3>
-              <div className="space-y-4">
-                {[
-                  { date: "Mar 1-5", event: "Mid-Semester Exams", type: "exam" },
-                  { date: "Mar 10", event: "Holi Holiday", type: "holiday" },
-                  { date: "Mar 15", event: "Sports Week Begins", type: "event" },
-                  { date: "Mar 20", event: "Projects Due", type: "deadline" },
-                  { date: "Apr 1-15", event: "End-Semester Exams", type: "exam" },
-                ].map((cal, i) => (
-                  <div key={i} className="flex gap-3">
-                    <div className="flex flex-col items-center pt-1">
-                      <div className={cn(
-                        "h-2.5 w-2.5 rounded-full shrink-0",
-                        cal.type === "exam" ? "bg-red-500" : cal.type === "holiday" ? "bg-emerald-500" : cal.type === "event" ? "bg-blue-500" : "bg-amber-500"
-                      )} />
-                      {i !== 4 && <div className="w-[1px] flex-1 bg-border mt-1" />}
-                    </div>
-                    <div className="pb-3">
-                      <p className="text-sm font-medium text-foreground">{cal.event}</p>
-                      <p className="text-xs text-muted-foreground">{cal.date}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </motion.div>
+        <SmartCalendar role="teacher" />
       )}
     </DashboardShell>
   )

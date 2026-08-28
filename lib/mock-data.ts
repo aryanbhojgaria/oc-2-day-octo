@@ -275,6 +275,70 @@ export const messMenu = [
   { day: "Sunday", breakfast: "Chole Bhature, Lassi", lunch: "Special Biryani, Ice Cream", dinner: "Chapati, Kadai Paneer, Kheer" },
 ]
 
+export const lostAndFoundItems = [
+  { id: "lf1", title: "Casio Calculator", description: "Found a black scientific calculator in Lecture Hall 3", location: "LH-3", date: "Today, 10:30 AM", status: "found", contact: "Admin Desk" },
+  { id: "lf2", title: "Blue Water Bottle", description: "Lost my Milton bottle near the sports complex", location: "Sports Complex", date: "Yesterday", status: "lost", contact: "Arjun (3rd Year)" },
+  { id: "lf3", title: "Hostel Keys", description: "Found a bunch of keys with a Spiderman keychain", location: "Library Café", date: "Mar 2", status: "found", contact: "Library Counter" },
+]
+
+export const roomBookings = [
+  { id: "rb1", room: "Auditorium", club: "Cultural Committee", date: "Mar 15, 2026", time: "14:00 - 18:00", status: "approved" },
+  { id: "rb2", room: "Seminar Hall B", club: "Coding Club", date: "Mar 12, 2026", time: "16:00 - 18:00", status: "pending" },
+  { id: "rb3", room: "Basketball Court", club: "Sports Council", date: "Mar 10, 2026", time: "06:00 - 09:00", status: "approved" },
+]
+
+export const campusFeedback = [
+  { id: "fb1", text: "The new library hours are fantastic, thanks!", sentiment: "positive" },
+  { id: "fb2", text: "Wi-Fi in Aryabhata hostel is very unstable during evenings.", sentiment: "negative" },
+  { id: "fb3", text: "Food in the mess today was great.", sentiment: "positive" },
+  { id: "fb4", text: "Need more printers in the computer lab.", sentiment: "neutral" },
+  { id: "fb5", text: "The sports equipment is getting old and needs replacement.", sentiment: "negative" },
+  { id: "fb6", text: "Love the new Coding Club events!", sentiment: "positive" },
+]
+
+export const clashingSchedules = [
+  { id: "cs1", time: "09:00 - 10:00", subject: "Data Structures", teacher: "Dr. Kavitha Nair", room: "LH-1", defaultStatus: "ok", resolvedRoom: "LH-1" },
+  { id: "cs2", time: "10:00 - 11:00", subject: "Operating Systems", teacher: "Prof. Rajesh Kumar", room: "LH-2", defaultStatus: "clash", resolvedRoom: "LH-5" },
+  { id: "cs3", time: "10:00 - 11:00", subject: "Computer Networks", teacher: "Prof. Rajesh Kumar", room: "LH-3", defaultStatus: "clash", resolvedRoom: "LH-3" },
+  { id: "cs4", time: "11:30 - 12:30", subject: "Database Systems", teacher: "Dr. Sunita Patel", room: "LH-4", defaultStatus: "ok", resolvedRoom: "LH-4" },
+]
+
+export const maintenanceTickets = [
+  {
+    id: "tk1",
+    student: "John Doe",
+    issue: "The projector screen in Lecture Hall 2 is ripped and won't roll up.",
+    location: "LH-2",
+    status: "Open",
+    date: "2024-03-24",
+    ai_category: "AV Equipment",
+    ai_priority: "Medium",
+    ai_draft_response: "Thank you for reporting. The AV team has scheduled a replacement screen for LH-2 tomorrow morning."
+  },
+  {
+    id: "tk2",
+    student: "Sarah Smith",
+    issue: "Water leaking near the entrance of Block B hostel from the AC unit.",
+    location: "Hostel B",
+    status: "Open",
+    date: "2024-03-24",
+    ai_category: "Plumbing/AC",
+    ai_priority: "Urgent",
+    ai_draft_response: "We have dispatched the maintenance team immediately to address the leak at Hostel B. Please exercise caution near the area."
+  },
+  {
+    id: "tk3",
+    student: "Rahul Sharma",
+    issue: "Wi-Fi is extremely slow in the Central Library 2nd floor.",
+    location: "Library",
+    status: "Resolved",
+    date: "2024-03-22",
+    ai_category: "IT/Network",
+    ai_priority: "High",
+    ai_draft_response: "IT resolved the access point router issue on the 2nd floor. Speed should be nominal."
+  }
+]
+
 // ========== MESS MENU EXTENDED ==========
 export const messMenuExtended = [
   { day: "Monday", breakfast: "Idli, Sambar, Chutney", lunch: "Rice, Dal, Paneer Butter Masala", snacks: "Samosa, Tea", dinner: "Chapati, Mixed Veg, Raita" },

@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { AccentSwitcher } from "@/components/accent-switcher"
-import { OctaBot } from "@/components/octobot/octobot"
+import { OctoBot } from "@/components/octobot"
 import { CommandSearch } from "@/components/command-search"
 import { NotificationCenter } from "@/components/notification-center"
 import { DNDProvider, useDND } from "@/components/dnd-context"
@@ -81,7 +81,7 @@ function DashboardShellInner({ role, navItems, children, activeNav, onNavClick }
           </div>
         </div>
 
-        <nav className="flex-1 space-y-1 px-3 py-4">
+        <nav className="flex-1 space-y-1 px-3 py-4 overflow-y-auto">
           {navItems.map((item) => {
             const isActive = activeNav
               ? activeNav.toLowerCase() === item.label.toLowerCase()
@@ -105,7 +105,8 @@ function DashboardShellInner({ role, navItems, children, activeNav, onNavClick }
                 {isActive && (
                   <motion.div
                     layoutId="sidebar-indicator"
-                    className="absolute left-0 h-8 w-1 rounded-r-full bg-primary"
+                    className="absolute left-0 h-8 w-1 rounded-r-full bg-primary animate-glow-pulse"
+                    transition={{ type: "spring", damping: 20, stiffness: 300 }}
                   />
                 )}
                 <item.icon className="h-4 w-4" />
@@ -134,7 +135,7 @@ function DashboardShellInner({ role, navItems, children, activeNav, onNavClick }
       {/* Main Content */}
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Top Header */}
-        <header className="flex items-center justify-between border-b border-border bg-sidebar px-4 py-3 lg:px-6">
+        <header className="flex items-center justify-between border-b border-border px-4 py-3 lg:px-6 glass-strong">
           <button
             onClick={() => setSidebarOpen(true)}
             className="rounded-lg p-2 text-muted-foreground hover:bg-secondary lg:hidden"
@@ -170,17 +171,16 @@ function DashboardShellInner({ role, navItems, children, activeNav, onNavClick }
         {/* Page Content */}
         <main className="flex-1 overflow-y-auto p-4 lg:p-6">
           <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
+            initial={{ opacity: 0, y: 16, filter: "blur(6px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            transition={{ type: "spring", damping: 25, stiffness: 120 }}
+            key={activeNav || "default"}
           >
             {children}
           </motion.div>
+          <OctoBot role={role} />
         </main>
       </div>
-
-      {/* OctaBot AI Chatbot */}
-      <OctaBot />
     </div>
   )
 }

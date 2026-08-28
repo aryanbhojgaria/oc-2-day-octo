@@ -2,22 +2,28 @@
 
 import { useState } from "react"
 import { DashboardShell } from "@/components/layout/dashboard-shell"
+import { SmartCalendar } from "@/components/smart-calendar"
 import { useFees, useMarks, useStudents, DataLoading } from "@/lib/hooks"
+import { students, fees, marks } from "@/lib/mock-data"
+import { generateParentDigest } from "@/lib/mock-ai"
 import { FeePayment } from "@/components/fee-payment"
-import { BarChart3, CreditCard, MessageSquare, TrendingUp, Check, Clock } from "lucide-react"
+import { BarChart3, CreditCard, MessageSquare, TrendingUp, Check, Clock, Sparkles, CalendarDays } from "lucide-react"
 import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
 
 const navItems = [
   { label: "performance", href: "/dashboard/parent", icon: BarChart3 },
   { label: "fees", href: "/dashboard/parent", icon: CreditCard },
+  { label: "calendar", href: "/dashboard/parent", icon: CalendarDays },
   { label: "meeting", href: "/dashboard/parent", icon: MessageSquare },
 ]
 
 export default function ParentDashboardPage() {
-  const [activeTab, setActiveTab] = useState<"performance" | "fees" | "meeting">("performance")
+  const [activeTab, setActiveTab] = useState<"performance" | "fees" | "calendar" | "meeting">("performance")
   const [meetingForm, setMeetingForm] = useState({ teacher: "", date: "", reason: "" })
   const [meetingSubmitted, setMeetingSubmitted] = useState(false)
+  const [isGeneratingDigest, setIsGeneratingDigest] = useState(false)
+  const [digestResult, setDigestResult] = useState<string | null>(null)
 
   // Live data
   const studentsHook = useStudents()
@@ -25,15 +31,15 @@ export default function ParentDashboardPage() {
   const feesHook = useFees()
 
   // Use first student as "ward" (in a real app this would be the linked child)
-  const ward = studentsHook.data?.[0]
-  const liveMarks = marksHook.data ?? []
-  const liveFees = feesHook.data ?? []
+  const ward = studentsHook.data && studentsHook.data.length > 0 ? studentsHook.data[0] : students[0]
+  const liveMarks = marksHook.data && marksHook.data.length > 0 ? marksHook.data : (marks as any[])
+  const liveFees = feesHook.data && feesHook.data.length > 0 ? feesHook.data : (fees as any[])
 
   return (
     <DashboardShell role="parent" navItems={navItems} activeNav={activeTab} onNavClick={(label) => setActiveTab(label as typeof activeTab)}>
       {/* Tab Switcher */}
       <div className="mb-6 flex flex-wrap gap-2">
-        {(["performance", "fees", "meeting"] as const).map((tab) => (
+        {(["performance", "fees", "calendar", "meeting"] as const).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -44,7 +50,7 @@ export default function ParentDashboardPage() {
                 : "text-muted-foreground hover:bg-secondary hover:text-foreground"
             )}
           >
-            {tab === "meeting" ? "Request Meeting" : tab === "performance" ? "Ward Performance" : tab}
+            {tab === "meeting" ? "Request Meeting" : tab === "performance" ? "Ward Performance" : tab === "calendar" ? "Calendar" : tab}
           </button>
         ))}
       </div>
@@ -65,7 +71,7 @@ export default function ParentDashboardPage() {
                   <div>
                     <h2 className="text-lg font-bold text-foreground">{ward.name}</h2>
                     <p className="text-sm text-muted-foreground">{ward.department} — Year {ward.year}</p>
-                    <p className="text-xs text-muted-foreground">{ward.externalId}</p>
+                    <p className="text-xs text-muted-foreground">{(ward as any).externalId || ward.id}</p>
                   </div>
                 </div>
               </div>
@@ -95,6 +101,62 @@ export default function ParentDashboardPage() {
                   <p className="mt-2 text-xl font-bold text-foreground">{ward.hostel ? "Hosteller" : "Day Scholar"}</p>
                   <p className="mt-1.5 text-xs text-muted-foreground">{ward.hostel ? "Block Aryabhata, Room B-204" : "Local residence"}</p>
                 </div>
+              </div>
+
+              {/* Weekly AI Digest */}
+              <div className="rounded-xl border-2 border-primary/20 bg-primary/5 p-6 relative overflow-hidden">
+                <div className="relative z-10 flex flex-col md:flex-row md:items-start justify-between gap-4">
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/20 text-primary">
+                        <Sparkles className="h-4 w-4" />
+                      </div>
+                      <h3 className="text-lg font-bold text-foreground">Weekly AI Digest</h3>
+                    </div>
+                    <p className="text-sm text-muted-foreground max-w-md">
+                      Instantly generate a comprehensive, personalized summary of your ward&apos;s academic performance, attendance trends, and upcoming actionable items.
+                    </p>
+                  </div>
+
+                  {!digestResult && (
+                    <button
+                      onClick={() => {
+                        setIsGeneratingDigest(true)
+                        setTimeout(() => {
+                          setDigestResult(generateParentDigest(ward.name, ward.attendance, ward.cgpa))
+                          setIsGeneratingDigest(false)
+                        }, 1200)
+                      }}
+                      disabled={isGeneratingDigest}
+                      className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50 whitespace-nowrap h-fit"
+                    >
+                      {isGeneratingDigest ? (
+                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
+                      ) : (
+                        <Sparkles className="h-4 w-4" />
+                      )}
+                      {isGeneratingDigest ? "Analyzing Records…" : "Generate Digest"}
+                    </button>
+                  )}
+                </div>
+
+                {digestResult && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    className="mt-6 rounded-lg bg-card/80 backdrop-blur-md p-5 border border-primary/20"
+                  >
+                    <div className="whitespace-pre-wrap text-sm text-foreground leading-relaxed">
+                      {digestResult}
+                    </div>
+                    <button
+                      onClick={() => setDigestResult(null)}
+                      className="mt-4 text-xs font-semibold text-primary hover:underline hover:text-primary/80"
+                    >
+                      Clear Digest
+                    </button>
+                  </motion.div>
+                )}
               </div>
 
               {/* Marks */}
@@ -205,6 +267,11 @@ export default function ParentDashboardPage() {
             </>
           )}
         </motion.div>
+      )}
+
+      {/* Calendar */}
+      {activeTab === "calendar" && (
+        <SmartCalendar role="parent" />
       )}
 
       {/* Meeting Request */}

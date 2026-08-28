@@ -281,6 +281,35 @@ async function main() {
     }
     console.log("✅ Timetable seeded")
 
+    // ─── EXAMS ───────────────────────────────────────────────────────
+    const examsData = [
+        { externalId: "EXM001", subject: "Data Structures", date: "2026-03-15", time: "10:00 AM", duration: 180 },
+        { externalId: "EXM002", subject: "Operating Systems", date: "2026-03-17", time: "02:00 PM", duration: 180 },
+    ]
+    for (const ex of examsData) {
+        await prisma.exam.upsert({
+            where: { externalId: ex.externalId },
+            update: {},
+            create: ex,
+        })
+    }
+    console.log("✅ Exams seeded")
+
+    // ─── CALENDAR EVENTS ─────────────────────────────────────────────
+    await prisma.calendarEvent.deleteMany({})
+    const calendarEventsData = [
+        { title: "Mid-Semester Exams", description: "Mid-semester examinations for all departments", date: "2026-03-01", endDate: "2026-03-05", type: "exam", color: null, createdBy: "ADMIN" },
+        { title: "Holi Holiday", description: "Festival of Colors — campus closed", date: "2026-03-10", endDate: null, type: "holiday", color: null, createdBy: "ADMIN" },
+        { title: "Sports Week", description: "Annual inter-department sports competition", date: "2026-03-15", endDate: "2026-03-20", type: "event", color: null, createdBy: "ADMIN" },
+        { title: "Project Submission Deadline", description: "Final submission for all semester projects", date: "2026-03-20", endDate: null, type: "deadline", color: null, createdBy: "ADMIN" },
+        { title: "Tuition Fee Due", description: "Last date to pay tuition fees without penalty", date: "2026-03-15", endDate: null, type: "fee", color: null, createdBy: "ADMIN" },
+        { title: "End-Semester Exams", description: "Final examinations for the semester", date: "2026-04-01", endDate: "2026-04-15", type: "exam", color: null, createdBy: "ADMIN" },
+        { title: "Hostel Fee Due", description: "Last date to pay hostel fees", date: "2026-04-10", endDate: null, type: "fee", color: null, createdBy: "ADMIN" },
+        { title: "Republic Day", description: "National holiday — campus closed", date: "2026-01-26", endDate: null, type: "holiday", color: null, createdBy: "ADMIN" },
+    ]
+    await prisma.calendarEvent.createMany({ data: calendarEventsData })
+    console.log("✅ Calendar events seeded")
+
     console.log("\n🎉 Database seeded successfully!")
     console.log("\n📋 Demo Login Credentials:")
     console.log("  Admin:   admin@oc-2-day.edu   / admin@2026")
